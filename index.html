@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculator</title>
+    <title>Calculator & Wordle</title>
     <style>
         * {
             margin: 0;
@@ -13,12 +13,59 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #000000;
+            background: #ffffff;
             height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #000000;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: #f3f3f3;
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            color: #666;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .tab.active {
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab:hover:not(.active) {
+            color: #000000;
+        }
+
+        .app-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            color: white;
+            flex: 1;
+        }
+
+        .app {
+            display: none;
+        }
+
+        .app.active {
+            display: block;
         }
 
         .calculator {
@@ -26,6 +73,7 @@
             width: 375px;
             max-width: 100vw;
             padding: 20px;
+            border-radius: 20px;
         }
 
         .display {
@@ -41,6 +89,7 @@
             justify-content: flex-end;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            border-radius: 10px;
         }
 
         .buttons {
@@ -117,6 +166,480 @@
             background: #5a5a5a;
         }
 
+        /* Wordle Styles */
+        .wordle {
+            background: #ffffff;
+            width: 400px;
+            max-width: 100vw;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .wordle-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #000000;
+            letter-spacing: 0.1em;
+        }
+
+        .game-board {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .row {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .tile {
+            width: 62px;
+            height: 62px;
+            border: 2px solid #d3d6da;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #000000;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .tile.correct {
+            background: #6aaa64;
+            border-color: #6aaa64;
+            color: #ffffff;
+        }
+
+        .tile.present {
+            background: #c9b458;
+            border-color: #c9b458;
+            color: #ffffff;
+        }
+
+        .tile.absent {
+            background: #787c7e;
+            border-color: #787c7e;
+            color: #ffffff;
+        }
+
+        .tile.filled {
+            border-color: #878a8c;
+            animation: pop 0.1s ease-in-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .key {
+            background: #d3d6da;
+            color: #000000;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            min-width: 40px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .key:hover {
+            background: #b8bcc0;
+        }
+
+        .key.wide {
+            min-width: 60px;
+        }
+
+        .key.correct {
+            background: #6aaa64;
+            color: #ffffff;
+        }
+
+        .key.present {
+            background: #c9b458;
+            color: #ffffff;
+        }
+
+        .key.absent {
+            background: #787c7e;
+            color: #ffffff;
+        }
+
+        .backspace-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 30px;
+            color: #000000;
+        }
+
+        .message.win {
+            color: #6aaa64;
+        }
+
+        .message.lose {
+            color: #e74c3c;
+        }
+
+        /* Nutrition Calculator Styles */
+        .nutrition {
+            background: #ffffff;
+            width: 500px;
+            max-width: 100vw;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .nutrition-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #000000;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d3d6da;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #6aaa64;
+        }
+
+        .input-field.error {
+            border-color: #e74c3c;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: #6aaa64;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .calculate-btn:hover {
+            background: #5a9a54;
+        }
+
+        .calculate-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .result-value {
+            font-weight: bold;
+            color: #000;
+        }
+
+        .macro-check {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .notes {
+            margin-top: 15px;
+            padding: 10px;
+            background: #fff3cd;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            background: #f8f9fa;
+            border: 1px solid #d3d6da;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            color: #6f42c1;
+            font-weight: 600;
+        }
+
+        .preset-btn:hover {
+            background: #e9ecef;
+        }
+
+        /* ITM Styles */
+        .itm {
+            background: #ffffff;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .itm-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .itm-logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .itm-tagline {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .itm-description {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .itm-nav {
+            background: #2c3e50;
+            padding: 0;
+            margin: 0;
+        }
+
+        .itm-nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .itm-nav li {
+            margin: 0;
+        }
+
+        .itm-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 20px 30px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .itm-nav a:hover {
+            background: #34495e;
+        }
+
+        .itm-content {
+            padding: 60px 40px;
+        }
+
+        .itm-section {
+            margin-bottom: 60px;
+        }
+
+        .itm-section h2 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .itm-section h3 {
+            color: #34495e;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .itm-services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .itm-service {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .itm-service:hover {
+            transform: translateY(-5px);
+        }
+
+        .itm-service-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .itm-service h4 {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .itm-service p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .itm-cta {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .itm-cta h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .itm-cta p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .itm-btn {
+            background: white;
+            color: #667eea;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .itm-btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .itm-footer {
+            background: #2c3e50;
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .itm-footer p {
+            margin: 0;
+            opacity: 0.8;
+        }
+
         @media (max-width: 400px) {
             .calculator {
                 width: 100vw;
@@ -137,46 +660,665 @@
                 font-size: 3rem;
                 padding: 15px 15px 30px 15px;
             }
+
+            .wordle {
+                width: 100vw;
+                padding: 10px;
+            }
+
+            .tile {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+
+            .key {
+                padding: 10px 6px;
+                font-size: 12px;
+                min-width: 35px;
+            }
+
+            .key.wide {
+                min-width: 50px;
+            }
+
+            .nutrition {
+                width: 100vw;
+                padding: 15px;
+            }
+
+            .preset-buttons {
+                flex-direction: column;
+            }
+
+            .preset-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .itm {
+                width: 100vw;
+            }
+
+            .itm-header {
+                padding: 40px 20px;
+            }
+
+            .itm-logo {
+                font-size: 2rem;
+            }
+
+            .itm-tagline {
+                font-size: 1.2rem;
+            }
+
+            .itm-nav ul {
+                flex-direction: column;
+            }
+
+            .itm-nav a {
+                padding: 15px 20px;
+                text-align: center;
+            }
+
+            .itm-content {
+                padding: 40px 20px;
+            }
+
+            .itm-services {
+                grid-template-columns: 1fr;
+            }
+
+            .itm-cta {
+                padding: 40px 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="calculator">
-        <div class="display" id="display">0</div>
-        <div class="buttons">
-            <button class="function" onclick="clearDisplay()">AC</button>
-            <button class="function" onclick="toggleSign()">+/-</button>
-            <button class="function" onclick="appendOperator('%')">%</button>
-            <button class="operator" onclick="appendOperator('/')">÷</button>
-            
-            <button onclick="appendNumber('7')">7</button>
-            <button onclick="appendNumber('8')">8</button>
-            <button onclick="appendNumber('9')">9</button>
-            <button class="operator" onclick="appendOperator('*')">×</button>
-            
-            <button onclick="appendNumber('4')">4</button>
-            <button onclick="appendNumber('5')">5</button>
-            <button onclick="appendNumber('6')">6</button>
-            <button class="operator" onclick="appendOperator('-')">-</button>
-            
-            <button onclick="appendNumber('1')">1</button>
-            <button onclick="appendNumber('2')">2</button>
-            <button onclick="appendNumber('3')">3</button>
-            <button class="operator" onclick="appendOperator('+')">+</button>
-            
-            <button class="zero" onclick="appendNumber('0')">0</button>
-            <button onclick="appendDecimal()">.</button>
-            <button class="operator" onclick="calculate()">=</button>
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('calculator')">Calculator</button>
+        <button class="tab" onclick="switchTab('wordle')">Wordle</button>
+        <button class="tab" onclick="switchTab('nutrition')">Nutrition</button>
+        <button class="tab" onclick="switchTab('itm')">ITM</button>
+    </div>
+    
+    <div class="app-container">
+        <div class="app active" id="calculator">
+            <div class="calculator">
+                <div class="display" id="display">0</div>
+                <div class="buttons">
+                    <button class="function" onclick="clearDisplay()">AC</button>
+                    <button class="function" onclick="toggleSign()">+/-</button>
+                    <button class="function" onclick="appendOperator('%')">%</button>
+                    <button class="operator" onclick="appendOperator('/')">÷</button>
+                    
+                    <button onclick="appendNumber('7')">7</button>
+                    <button onclick="appendNumber('8')">8</button>
+                    <button onclick="appendNumber('9')">9</button>
+                    <button class="operator" onclick="appendOperator('*')">×</button>
+                    
+                    <button onclick="appendNumber('4')">4</button>
+                    <button onclick="appendNumber('5')">5</button>
+                    <button onclick="appendNumber('6')">6</button>
+                    <button class="operator" onclick="appendOperator('-')">-</button>
+                    
+                    <button onclick="appendNumber('1')">1</button>
+                    <button onclick="appendNumber('2')">2</button>
+                    <button onclick="appendNumber('3')">3</button>
+                    <button class="operator" onclick="appendOperator('+')">+</button>
+                    
+                    <button class="zero" onclick="appendNumber('0')">0</button>
+                    <button onclick="appendDecimal()">.</button>
+                    <button class="operator" onclick="calculate()">=</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="app" id="wordle">
+            <div class="wordle">
+                <div class="wordle-title">WORDLE</div>
+                <div class="game-board" id="gameBoard"></div>
+                <div class="keyboard" id="keyboard"></div>
+                <div class="message" id="message"></div>
+            </div>
+        </div>
+
+        <div class="app" id="nutrition">
+            <div class="nutrition">
+                <div class="nutrition-title">Macro Calculator</div>
+                
+                <div class="preset-buttons">
+                    <button class="preset-btn" onclick="setPreset(2200, 30, 25, 45)">Balanced (30/25/45)</button>
+                    <button class="preset-btn" onclick="setPreset(2000, 35, 25, 40)">High Protein (35/25/40)</button>
+                    <button class="preset-btn" onclick="setPreset(1800, 25, 35, 40)">High Fat (25/35/40)</button>
+                    <button class="preset-btn" onclick="setPreset(2500, 20, 20, 60)">High Carb (20/20/60)</button>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label" for="calories">Daily Calories (kcal)</label>
+                    <input type="number" id="calories" class="input-field" placeholder="2200" min="800" max="10000">
+                    <div class="error-message" id="calories-error"></div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label" for="proteinPct">Protein %</label>
+                    <input type="number" id="proteinPct" class="input-field" placeholder="30" min="0" max="100" step="0.1">
+                    <div class="error-message" id="proteinPct-error"></div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label" for="fatPct">Fat %</label>
+                    <input type="number" id="fatPct" class="input-field" placeholder="25" min="0" max="100" step="0.1">
+                    <div class="error-message" id="fatPct-error"></div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label" for="carbPct">Carbs %</label>
+                    <input type="number" id="carbPct" class="input-field" placeholder="45" min="0" max="100" step="0.1">
+                    <div class="error-message" id="carbPct-error"></div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateMacros()">Calculate Macros</button>
+
+                <div class="results" id="results">
+                    <div class="result-item">
+                        <span class="result-label">Protein:</span>
+                        <span class="result-value" id="proteinGrams">0.0 g</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Fat:</span>
+                        <span class="result-value" id="fatGrams">0.0 g</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Carbs:</span>
+                        <span class="result-value" id="carbGrams">0.0 g</span>
+                    </div>
+                    
+                    <div class="macro-check">
+                        <div class="result-item">
+                            <span class="result-label">Macro kcal:</span>
+                            <span class="result-value" id="macroKcal">0.0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">kcal Difference:</span>
+                            <span class="result-value" id="kcalDiff">0.0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="notes" id="notes" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app" id="itm">
+            <div class="itm">
+                <header class="itm-header">
+                    <div class="itm-logo">ITMethods</div>
+                    <div class="itm-tagline">Transforming Business Through Technology</div>
+                    <div class="itm-description">
+                        We deliver innovative IT solutions that drive digital transformation, enhance operational efficiency, and accelerate business growth for organizations worldwide.
+                    </div>
+                </header>
+
+                <nav class="itm-nav">
+                    <ul>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#solutions">Solutions</a></li>
+                        <li><a href="#consulting">Consulting</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </nav>
+
+                <main class="itm-content">
+                    <section class="itm-section">
+                        <h2>Our Services</h2>
+                        <div class="itm-services">
+                            <div class="itm-service">
+                                <div class="itm-service-icon">💻</div>
+                                <h4>Cloud Solutions</h4>
+                                <p>Comprehensive cloud migration, architecture design, and optimization services to help you leverage the power of cloud computing.</p>
+                            </div>
+                            <div class="itm-service">
+                                <div class="itm-service-icon">🔒</div>
+                                <h4>Cybersecurity</h4>
+                                <p>Advanced security solutions including threat assessment, compliance management, and incident response to protect your digital assets.</p>
+                            </div>
+                            <div class="itm-service">
+                                <div class="itm-service-icon">📊</div>
+                                <h4>Data Analytics</h4>
+                                <p>Transform your data into actionable insights with our advanced analytics, business intelligence, and machine learning solutions.</p>
+                            </div>
+                            <div class="itm-service">
+                                <div class="itm-service-icon">⚡</div>
+                                <h4>Digital Transformation</h4>
+                                <p>End-to-end digital transformation services to modernize your business processes and enhance customer experiences.</p>
+                            </div>
+                            <div class="itm-service">
+                                <div class="itm-service-icon">🔧</div>
+                                <h4>IT Consulting</h4>
+                                <p>Strategic IT consulting to align technology with business objectives and drive sustainable growth.</p>
+                            </div>
+                            <div class="itm-service">
+                                <div class="itm-service-icon">🌐</div>
+                                <h4>DevOps & Automation</h4>
+                                <p>Streamline development and operations with our DevOps practices, CI/CD pipelines, and automation solutions.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="itm-section">
+                        <h2>Why Choose ITMethods?</h2>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 40px;">
+                            <div>
+                                <h3>Expert Team</h3>
+                                <p>Our certified professionals bring years of experience across multiple technologies and industries.</p>
+                            </div>
+                            <div>
+                                <h3>Proven Results</h3>
+                                <p>We've successfully delivered over 500 projects for clients ranging from startups to Fortune 500 companies.</p>
+                            </div>
+                            <div>
+                                <h3>24/7 Support</h3>
+                                <p>Round-the-clock technical support and monitoring to ensure your systems run smoothly.</p>
+                            </div>
+                            <div>
+                                <h3>Innovation Focus</h3>
+                                <p>We stay ahead of technology trends to provide cutting-edge solutions that give you a competitive edge.</p>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+
+                <section class="itm-cta">
+                    <h2>Ready to Transform Your Business?</h2>
+                    <p>Let's discuss how our IT solutions can drive your success</p>
+                    <a href="#contact" class="itm-btn">Get Started Today</a>
+                </section>
+
+                <footer class="itm-footer">
+                    <p>&copy; 2024 ITMethods. All rights reserved. | Transforming Business Through Technology</p>
+                </footer>
+            </div>
         </div>
     </div>
 
     <script>
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all apps
+            document.querySelectorAll('.app').forEach(app => {
+                app.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected app and activate tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Reset Wordle game when switching to it
+            if (tabName === 'wordle') {
+                resetWordleGame();
+            }
+        }
+
+        // Calculator variables
         let display = document.getElementById('display');
         let currentInput = '0';
         let operator = null;
         let previousInput = null;
         let shouldResetDisplay = false;
         let isNewCalculation = true;
+
+        // Wordle variables
+        const WORDLE_ANSWER = 'CORAL';
+        let currentRow = 0;
+        let currentTile = 0;
+        let gameOver = false;
+        let guessedLetters = {};
+
+        // Reset Wordle game
+        function resetWordleGame() {
+            currentRow = 0;
+            currentTile = 0;
+            gameOver = false;
+            guessedLetters = {};
+            
+            // Clear all tiles
+            for (let row = 0; row < 6; row++) {
+                for (let tile = 0; tile < 5; tile++) {
+                    const tileElement = document.getElementById(`tile-${row}-${tile}`);
+                    if (tileElement) {
+                        tileElement.textContent = '';
+                        tileElement.className = 'tile';
+                    }
+                }
+            }
+            
+            // Reset keyboard colors
+            const keys = document.querySelectorAll('.key');
+            keys.forEach(key => {
+                key.classList.remove('correct', 'present', 'absent');
+            });
+            
+            // Clear message
+            const message = document.getElementById('message');
+            message.textContent = '';
+            message.className = 'message';
+        }
+
+        // Initialize Wordle game
+        function initWordle() {
+            const gameBoard = document.getElementById('gameBoard');
+            const keyboard = document.getElementById('keyboard');
+            
+            // Create game board (6 rows, 5 tiles each)
+            for (let row = 0; row < 6; row++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row';
+                rowDiv.id = `row-${row}`;
+                
+                for (let tile = 0; tile < 5; tile++) {
+                    const tileDiv = document.createElement('div');
+                    tileDiv.className = 'tile';
+                    tileDiv.id = `tile-${row}-${tile}`;
+                    rowDiv.appendChild(tileDiv);
+                }
+                
+                gameBoard.appendChild(rowDiv);
+            }
+            
+            // Create keyboard
+            const keyboardLayout = [
+                ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+                ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+                ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE']
+            ];
+            
+            keyboardLayout.forEach((row, rowIndex) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'keyboard-row';
+                
+                row.forEach(key => {
+                    const keyDiv = document.createElement('button');
+                    keyDiv.className = 'key';
+                    
+                    if (key === 'BACKSPACE') {
+                        keyDiv.innerHTML = `
+                            <svg class="backspace-icon" viewBox="0 0 24 24">
+                                <path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"/>
+                            </svg>
+                        `;
+                        keyDiv.classList.add('wide');
+                    } else {
+                        keyDiv.textContent = key;
+                        if (key === 'ENTER') {
+                            keyDiv.classList.add('wide');
+                        }
+                    }
+                    
+                    keyDiv.onclick = () => handleKeyPress(key);
+                    rowDiv.appendChild(keyDiv);
+                });
+                
+                keyboard.appendChild(rowDiv);
+            });
+        }
+
+        function handleKeyPress(key) {
+            if (gameOver) return;
+            
+            if (key === 'BACKSPACE') {
+                if (currentTile > 0) {
+                    currentTile--;
+                    const tile = document.getElementById(`tile-${currentRow}-${currentTile}`);
+                    tile.textContent = '';
+                    tile.classList.remove('filled');
+                }
+            } else if (key === 'ENTER') {
+                if (currentTile === 5) {
+                    checkGuess();
+                }
+            } else if (key.length === 1 && currentTile < 5) {
+                const tile = document.getElementById(`tile-${currentRow}-${currentTile}`);
+                tile.textContent = key.toUpperCase();
+                tile.classList.add('filled');
+                currentTile++;
+            }
+        }
+
+        function checkGuess() {
+            const guess = [];
+            for (let i = 0; i < 5; i++) {
+                const tile = document.getElementById(`tile-${currentRow}-${i}`);
+                guess.push(tile.textContent);
+            }
+            
+            const guessWord = guess.join('');
+            const answer = WORDLE_ANSWER.split('');
+            const guessArray = guessWord.split('');
+            
+            // Check each letter
+            const result = [];
+            const answerCopy = [...answer];
+            
+            // First pass: mark correct letters
+            for (let i = 0; i < 5; i++) {
+                if (guessArray[i] === answerCopy[i]) {
+                    result[i] = 'correct';
+                    answerCopy[i] = null;
+                } else {
+                    result[i] = null;
+                }
+            }
+            
+            // Second pass: mark present letters
+            for (let i = 0; i < 5; i++) {
+                if (result[i] === null) {
+                    const letterIndex = answerCopy.indexOf(guessArray[i]);
+                    if (letterIndex !== -1) {
+                        result[i] = 'present';
+                        answerCopy[letterIndex] = null;
+                    } else {
+                        result[i] = 'absent';
+                    }
+                }
+            }
+            
+            // Update tile colors
+            for (let i = 0; i < 5; i++) {
+                const tile = document.getElementById(`tile-${currentRow}-${i}`);
+                tile.classList.add(result[i]);
+                
+                // Update keyboard colors
+                const keys = document.querySelectorAll('.key');
+                keys.forEach(k => {
+                    const keyText = k.textContent.trim();
+                    if (keyText === guessArray[i]) {
+                        if (result[i] === 'correct') {
+                            k.classList.add('correct');
+                        } else if (result[i] === 'present' && !k.classList.contains('correct')) {
+                            k.classList.add('present');
+                        } else if (result[i] === 'absent' && !k.classList.contains('correct') && !k.classList.contains('present')) {
+                            k.classList.add('absent');
+                        }
+                    }
+                });
+            }
+            
+            // Check win condition
+            if (guessWord === WORDLE_ANSWER) {
+                gameOver = true;
+                document.getElementById('message').textContent = 'Congratulations! You won!';
+                document.getElementById('message').classList.add('win');
+            } else if (currentRow === 5) {
+                gameOver = true;
+                document.getElementById('message').textContent = `Game Over! The word was ${WORDLE_ANSWER}`;
+                document.getElementById('message').classList.add('lose');
+            } else {
+                currentRow++;
+                currentTile = 0;
+            }
+        }
+
+        // Keyboard event listener for Wordle
+        document.addEventListener('keydown', function(event) {
+            if (document.getElementById('wordle').classList.contains('active')) {
+                const key = event.key.toUpperCase();
+                if (key === 'BACKSPACE') {
+                    handleKeyPress('BACKSPACE');
+                } else if (key === 'ENTER') {
+                    handleKeyPress('ENTER');
+                } else if (key >= 'A' && key <= 'Z') {
+                    handleKeyPress(key);
+                }
+            }
+        });
+
+        // Initialize Wordle when page loads
+        window.addEventListener('load', initWordle);
+
+        // Nutrition Calculator Functions
+        function setPreset(calories, protein, fat, carbs) {
+            document.getElementById('calories').value = calories;
+            document.getElementById('proteinPct').value = protein;
+            document.getElementById('fatPct').value = fat;
+            document.getElementById('carbPct').value = carbs;
+            clearErrors();
+        }
+
+        function clearErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(el => {
+                el.classList.remove('show');
+                el.textContent = '';
+            });
+            
+            const inputFields = document.querySelectorAll('.input-field');
+            inputFields.forEach(field => {
+                field.classList.remove('error');
+            });
+        }
+
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(fieldId + '-error');
+            
+            field.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+
+        function validateInputs() {
+            clearErrors();
+            const errors = [];
+            
+            // Get input values
+            const calories = document.getElementById('calories').value;
+            const proteinPct = document.getElementById('proteinPct').value;
+            const fatPct = document.getElementById('fatPct').value;
+            const carbPct = document.getElementById('carbPct').value;
+            
+            // Validate calories
+            if (!calories || isNaN(calories) || !Number.isInteger(parseFloat(calories))) {
+                errors.push({ field: 'calories', message: 'Calories is required and must be a number.' });
+            } else {
+                const caloriesNum = parseInt(calories);
+                if (caloriesNum < 800 || caloriesNum > 10000) {
+                    errors.push({ field: 'calories', message: 'Calories must be an integer between 800 and 10,000.' });
+                }
+            }
+            
+            // Validate percentages
+            const percentages = [
+                { field: 'proteinPct', value: proteinPct, name: 'Protein%' },
+                { field: 'fatPct', value: fatPct, name: 'Fat%' },
+                { field: 'carbPct', value: carbPct, name: 'Carbs%' }
+            ];
+            
+            percentages.forEach(pct => {
+                if (!pct.value || isNaN(pct.value)) {
+                    errors.push({ field: pct.field, message: `${pct.name} is required and must be a number.` });
+                } else {
+                    const num = parseFloat(pct.value);
+                    if (num < 0 || num > 100) {
+                        errors.push({ field: pct.field, message: `${pct.name} must be a number between 0 and 100.` });
+                    }
+                }
+            });
+            
+            // Validate sum of percentages
+            if (errors.length === 0) {
+                const sum = parseFloat(proteinPct) + parseFloat(fatPct) + parseFloat(carbPct);
+                if (Math.abs(sum - 100) > 0.5) {
+                    errors.push({ field: 'sum', message: 'Protein% + Fat% + Carbs% must total 100 (±0.5).' });
+                }
+            }
+            
+            // Show errors
+            errors.forEach(error => {
+                if (error.field === 'sum') {
+                    // Show sum error on all percentage fields
+                    showError('proteinPct', error.message);
+                    showError('fatPct', error.message);
+                    showError('carbPct', error.message);
+                } else {
+                    showError(error.field, error.message);
+                }
+            });
+            
+            return errors.length === 0;
+        }
+
+        function round1(x) {
+            return Math.round(x * 10) / 10;
+        }
+
+        function calculateMacros() {
+            if (!validateInputs()) {
+                document.getElementById('results').classList.remove('show');
+                return;
+            }
+            
+            // Get validated inputs
+            const calories = parseInt(document.getElementById('calories').value);
+            const proteinPct = parseFloat(document.getElementById('proteinPct').value);
+            const fatPct = parseFloat(document.getElementById('fatPct').value);
+            const carbPct = parseFloat(document.getElementById('carbPct').value);
+            
+            // Calculate grams
+            const proteinGrams = round1((calories * (proteinPct / 100)) / 4);
+            const fatGrams = round1((calories * (fatPct / 100)) / 9);
+            const carbGrams = round1((calories * (carbPct / 100)) / 4);
+            
+            // Macro kcal check
+            const macroKcal = round1(proteinGrams * 4 + fatGrams * 9 + carbGrams * 4);
+            const kcalDiff = round1(macroKcal - calories);
+            
+            // Display results
+            document.getElementById('proteinGrams').textContent = proteinGrams + ' g';
+            document.getElementById('fatGrams').textContent = fatGrams + ' g';
+            document.getElementById('carbGrams').textContent = carbGrams + ' g';
+            document.getElementById('macroKcal').textContent = macroKcal;
+            document.getElementById('kcalDiff').textContent = kcalDiff;
+            
+            // Handle notes
+            const notesElement = document.getElementById('notes');
+            if (Math.abs(kcalDiff) <= 1) {
+                notesElement.textContent = 'Totals may differ by up to 1 kcal due to rounding.';
+                notesElement.style.display = 'block';
+            } else {
+                notesElement.style.display = 'none';
+            }
+            
+            // Show results
+            document.getElementById('results').classList.add('show');
+        }
 
         function updateDisplay() {
             // Format large numbers with commas
@@ -303,22 +1445,24 @@
             }
         }
 
-        // Keyboard support
+        // Calculator keyboard support
         document.addEventListener('keydown', function(event) {
-            const key = event.key;
-            
-            if (key >= '0' && key <= '9') {
-                appendNumber(key);
-            } else if (key === '.') {
-                appendDecimal();
-            } else if (key === '+' || key === '-' || key === '*' || key === '/') {
-                appendOperator(key);
-            } else if (key === 'Enter' || key === '=') {
-                calculate();
-            } else if (key === 'Escape' || key === 'c' || key === 'C') {
-                clearDisplay();
-            } else if (key === '%') {
-                appendOperator('%');
+            if (document.getElementById('calculator').classList.contains('active')) {
+                const key = event.key;
+                
+                if (key >= '0' && key <= '9') {
+                    appendNumber(key);
+                } else if (key === '.') {
+                    appendDecimal();
+                } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                    appendOperator(key);
+                } else if (key === 'Enter' || key === '=') {
+                    calculate();
+                } else if (key === 'Escape' || key === 'c' || key === 'C') {
+                    clearDisplay();
+                } else if (key === '%') {
+                    appendOperator('%');
+                }
             }
         });
     </script>
